@@ -5,7 +5,6 @@ import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { forgotPasswordSchema } from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/site-config";
 
 const inputClass =
   "w-full rounded-lg border border-border bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-muted/60 transition-colors focus:border-accent-2 focus:bg-white/[0.07] focus:outline-none";
@@ -30,7 +29,9 @@ export function ForgotPasswordForm() {
     setSubmitting(true);
     const supabase = createClient();
     await supabase.auth.resetPasswordForEmail(validated.data.email, {
-      redirectTo: `${siteConfig.url}/auth/confirm?type=recovery`,
+      // Use the browser's own origin rather than an env var — see the
+      // same note in signup-form.tsx.
+      redirectTo: `${window.location.origin}/auth/confirm?type=recovery`,
     });
     setSubmitting(false);
     // Always show success, regardless of whether the email exists, so this

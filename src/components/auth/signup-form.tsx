@@ -5,7 +5,6 @@ import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { signupSchema } from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/site-config";
 
 const inputClass =
   "w-full rounded-lg border border-border bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-muted/60 transition-colors focus:border-accent-2 focus:bg-white/[0.07] focus:outline-none";
@@ -47,7 +46,10 @@ export function SignupForm() {
       password: validated.data.password,
       options: {
         data: { full_name: validated.data.fullName },
-        emailRedirectTo: `${siteConfig.url}/auth/confirm`,
+        // Use the browser's own origin rather than an env var, so this
+        // works correctly on localhost, Vercel preview URLs, and
+        // production without needing NEXT_PUBLIC_SITE_URL kept in sync.
+        emailRedirectTo: `${window.location.origin}/auth/confirm`,
       },
     });
     setSubmitting(false);
