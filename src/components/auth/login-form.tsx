@@ -36,16 +36,31 @@ export function LoginForm() {
 
     setSubmitting(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword(validated.data);
-    setSubmitting(false);
+    const { data, error } = await supabase.auth.signInWithPassword(validated.data);
 
-    if (error) {
+    if (error || !data.user) {
+      setSubmitting(false);
       setErrorMessage("Incorrect email or password.");
       return;
     }
 
-    const redirectTo = searchParams.get("redirectTo") ?? "/admin";
-    router.push(redirectTo);
+    // Only honor an explicit redirectTo (e.g. bounced here from a specific
+    // page that required auth) — otherwise land people on the workspace
+    // that's actually theirs. Defaulting everyone to /admin here was the
+    // bug: a non-admin customer would sign in and immediately get bounced
+    // to /unauthorized with nowhere else to go.
+    let target = searchParams.get("redirectTo");
+    if (!target) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .maybeSingle();
+      target = profile?.role === "admin" ? "/admin" : "/dashboard";
+    }
+
+    setSubmitting(false);
+    router.push(target);
     router.refresh();
   }
 

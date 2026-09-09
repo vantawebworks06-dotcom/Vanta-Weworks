@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { leadCaptureSchema } from "@/lib/validations/visualizer";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { sendEmail, escapeHtml } from "@/lib/email/send-email";
 
 export async function POST(request: Request) {
@@ -46,6 +47,14 @@ export async function POST(request: Request) {
   const { name, email, phone, business, projectDescription, budgetRange, timeline, visualizationRequestId } =
     parsed.data;
 
+  // Read the visitor's own session (if any) via the regular cookie-based
+  // client — separate from `admin`, which is the service-role client used
+  // for the actual write since this table has no public insert policy.
+  const sessionClient = await createClient();
+  const {
+    data: { user },
+  } = await sessionClient.auth.getUser();
+
   const { error } = await admin.from("leads").insert({
     name,
     email,
@@ -55,6 +64,7 @@ export async function POST(request: Request) {
     budget_range: budgetRange || null,
     timeline: timeline || null,
     visualization_request_id: visualizationRequestId || null,
+    user_id: user?.id ?? null,
   });
 
   if (error) {

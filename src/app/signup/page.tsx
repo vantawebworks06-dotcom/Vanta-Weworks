@@ -12,7 +12,7 @@ export default function SignupPage() {
   return (
     <AuthCard
       title="Create an account"
-      description="Sign up to request admin access to the Vanta Webworks dashboard."
+      description="Create an account to track your inquiries, project submissions, and AI Visualizer concepts in one place."
       footer={
         <>
           Already have an account?{" "}

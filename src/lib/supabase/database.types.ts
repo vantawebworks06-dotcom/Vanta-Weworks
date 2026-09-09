@@ -52,6 +52,7 @@ export type Database = {
           phone: string | null
           preferred_timeline: string | null
           service_interested: string | null
+          user_id: string | null
           website_url: string | null
         }
         Insert: {
@@ -66,6 +67,7 @@ export type Database = {
           phone?: string | null
           preferred_timeline?: string | null
           service_interested?: string | null
+          user_id?: string | null
           website_url?: string | null
         }
         Update: {
@@ -80,6 +82,7 @@ export type Database = {
           phone?: string | null
           preferred_timeline?: string | null
           service_interested?: string | null
+          user_id?: string | null
           website_url?: string | null
         }
         Relationships: []
@@ -158,6 +161,7 @@ export type Database = {
           phone: string | null
           project_description: string | null
           timeline: string | null
+          user_id: string | null
           visualization_request_id: string | null
         }
         Insert: {
@@ -171,6 +175,7 @@ export type Database = {
           phone?: string | null
           project_description?: string | null
           timeline?: string | null
+          user_id?: string | null
           visualization_request_id?: string | null
         }
         Update: {
@@ -184,6 +189,7 @@ export type Database = {
           phone?: string | null
           project_description?: string | null
           timeline?: string | null
+          user_id?: string | null
           visualization_request_id?: string | null
         }
         Relationships: [
@@ -430,6 +436,7 @@ export type Database = {
           status: string
           style: string | null
           target_audience: string | null
+          user_id: string | null
         }
         Insert: {
           business_name?: string | null
@@ -446,6 +453,7 @@ export type Database = {
           status?: string
           style?: string | null
           target_audience?: string | null
+          user_id?: string | null
         }
         Update: {
           business_name?: string | null
@@ -462,6 +470,7 @@ export type Database = {
           status?: string
           style?: string | null
           target_audience?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

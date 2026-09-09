@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { visualizeRequestSchema } from "@/lib/validations/visualizer";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { moderateText } from "@/lib/ai/openai-image";
 import { generateWebsiteConcept } from "@/lib/ai/openai-concept";
 import { AiConfigError, AiModerationError, AiProviderError, AiTimeoutError, AiValidationError } from "@/lib/ai/errors";
@@ -44,6 +45,11 @@ export async function POST(request: Request) {
     );
   }
 
+  const sessionClient = await createClient();
+  const {
+    data: { user },
+  } = await sessionClient.auth.getUser();
+
   const { data: requestRow, error: insertError } = await admin
     .from("visualization_requests")
     .insert({
@@ -54,6 +60,7 @@ export async function POST(request: Request) {
       colors: input.colors || null,
       features: input.features || null,
       status: "pending",
+      user_id: user?.id ?? null,
     })
     .select("id")
     .single();

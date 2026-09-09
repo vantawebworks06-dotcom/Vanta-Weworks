@@ -3,17 +3,34 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, UserCircle } from "lucide-react";
 import { mainNav } from "@/lib/site-config";
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/utils/cn";
+import { createClient } from "@/lib/supabase/client";
 
 export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+
+  // Detected client-side (rather than passed down from the root server
+  // layout) so public marketing pages that would otherwise be static don't
+  // get forced into dynamic rendering just to know whether to show this icon.
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getSession().then(({ data }) => setIsSignedIn(!!data.session));
+
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsSignedIn(!!session);
+    });
+
+    return () => subscription.subscription.unsubscribe();
+  }, []);
 
   // Close the mobile menu on navigation. Setting state during render (rather
   // than in an effect) is the React-recommended way to reset state in
@@ -77,7 +94,21 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="hidden lg:block">
+        <div className="hidden items-center gap-2 lg:flex">
+          {isSignedIn ? (
+            <Link
+              href="/dashboard"
+              aria-label="My account"
+              className={cn(
+                "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
+                pathname.startsWith("/dashboard")
+                  ? "bg-white/10 text-foreground"
+                  : "text-muted hover:bg-white/5 hover:text-foreground"
+              )}
+            >
+              <UserCircle className="h-5 w-5" aria-hidden="true" />
+            </Link>
+          ) : null}
           <Button href="/contact" variant="gradient" size="sm">
             Start Your Project
           </Button>
@@ -120,6 +151,18 @@ export function Navbar() {
               </Link>
             );
           })}
+          {isSignedIn ? (
+            <Link
+              href="/dashboard"
+              className={cn(
+                "flex items-center gap-2 rounded-lg px-3 py-3 text-base font-medium transition-colors",
+                pathname.startsWith("/dashboard") ? "bg-white/5 text-foreground" : "text-muted hover:text-foreground"
+              )}
+            >
+              <UserCircle className="h-4 w-4" aria-hidden="true" />
+              My Account
+            </Link>
+          ) : null}
           <Button href="/contact" variant="gradient" size="md" className="mt-3 w-full">
             Start Your Project
           </Button>

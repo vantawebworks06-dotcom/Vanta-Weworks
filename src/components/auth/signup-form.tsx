@@ -68,9 +68,8 @@ export function SignupForm() {
         <CheckCircle2 className="h-8 w-8 text-accent-2" aria-hidden="true" />
         <h2 className="font-display text-lg font-semibold">Check your email</h2>
         <p className="text-sm text-muted">
-          We&apos;ve sent a confirmation link to finish creating your account. New accounts
-          start with standard access — an existing administrator needs to grant admin access
-          before you can use the dashboard.
+          We&apos;ve sent a confirmation link to finish creating your account. Once confirmed,
+          you&apos;ll be able to sign in and see your dashboard right away.
         </p>
       </div>
     );

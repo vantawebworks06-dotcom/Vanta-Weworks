@@ -5,15 +5,15 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = {
-  title: "Admin Login",
+  title: "Sign In",
   robots: { index: false, follow: false },
 };
 
 export default function LoginPage() {
   return (
     <AuthCard
-      title="Admin Sign In"
-      description="Sign in to manage leads, projects, testimonials, and site content."
+      title="Sign In"
+      description="Sign in to view your account, or access the admin dashboard if you're a team member."
       footer={
         <>
           Don&apos;t have an account?{" "}
