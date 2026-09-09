@@ -68,6 +68,12 @@ export async function POST(request: Request) {
       );
     }
     console.error("Moderation check failed:", err);
+    if (err instanceof AiConfigError) {
+      return NextResponse.json(
+        { error: "The AI Visualizer isn't configured yet. Please try again later." },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
       { error: "The AI Visualizer isn't available right now. Please try again shortly." },
       { status: 503 }

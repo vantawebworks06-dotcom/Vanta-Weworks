@@ -98,6 +98,12 @@ export async function POST(request: Request) {
     }
     console.error("Moderation check failed:", err);
     await fail(err instanceof Error ? err.message : "Moderation check failed.");
+    if (err instanceof AiConfigError) {
+      return NextResponse.json(
+        { error: "The AI Visualizer isn't configured yet. Please try again later." },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
       { error: "The AI Visualizer isn't available right now. Please try again shortly." },
       { status: 503 }
