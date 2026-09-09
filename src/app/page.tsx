@@ -9,6 +9,7 @@ import { VisualizerCallout } from "@/components/sections/home/visualizer-callout
 import { Testimonials } from "@/components/sections/home/testimonials";
 import { PricingOverview } from "@/components/sections/home/pricing-overview";
 import { Faq } from "@/components/sections/home/faq";
+import { ClientSignIn } from "@/components/sections/home/client-sign-in";
 import { FinalCta } from "@/components/sections/home/final-cta";
 
 export const revalidate = 60;
@@ -30,6 +31,7 @@ export default function Home() {
       <Testimonials />
       <PricingOverview />
       <Faq />
+      <ClientSignIn />
       <FinalCta />
     </>
   );
