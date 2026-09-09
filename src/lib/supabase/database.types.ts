@@ -117,6 +117,79 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_concepts: {
+        Row: {
+          created_at: string
+          id: string
+          image_path: string
+          visualization_request_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_path: string
+          visualization_request_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_path?: string
+          visualization_request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_concepts_visualization_request_id_fkey"
+            columns: ["visualization_request_id"]
+            isOneToOne: false
+            referencedRelation: "visualization_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          business: string | null
+          created_at: string
+          email: string
+          id: string
+          is_handled: boolean
+          name: string
+          phone: string | null
+          project_description: string | null
+          visualization_request_id: string | null
+        }
+        Insert: {
+          business?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          is_handled?: boolean
+          name: string
+          phone?: string | null
+          project_description?: string | null
+          visualization_request_id?: string | null
+        }
+        Update: {
+          business?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          is_handled?: boolean
+          name?: string
+          phone?: string | null
+          project_description?: string | null
+          visualization_request_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_visualization_request_id_fkey"
+            columns: ["visualization_request_id"]
+            isOneToOne: false
+            referencedRelation: "visualization_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portfolio_items: {
         Row: {
           client_name: string | null
@@ -332,6 +405,48 @@ export type Database = {
           quote?: string
           rating?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      visualization_requests: {
+        Row: {
+          colors: string | null
+          created_at: string
+          description: string
+          error_message: string | null
+          features: string | null
+          id: string
+          industry: string | null
+          prompt_used: string | null
+          status: string
+          style: string | null
+          target_audience: string | null
+        }
+        Insert: {
+          colors?: string | null
+          created_at?: string
+          description: string
+          error_message?: string | null
+          features?: string | null
+          id?: string
+          industry?: string | null
+          prompt_used?: string | null
+          status?: string
+          style?: string | null
+          target_audience?: string | null
+        }
+        Update: {
+          colors?: string | null
+          created_at?: string
+          description?: string
+          error_message?: string | null
+          features?: string | null
+          id?: string
+          industry?: string | null
+          prompt_used?: string | null
+          status?: string
+          style?: string | null
+          target_audience?: string | null
         }
         Relationships: []
       }
