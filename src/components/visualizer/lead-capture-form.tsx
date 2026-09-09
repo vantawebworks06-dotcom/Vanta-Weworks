@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { leadCaptureSchema } from "@/lib/validations/visualizer";
+import { budgetRanges, timelineOptions } from "@/lib/validations/contact";
 import { Button } from "@/components/ui/button";
 
 const inputClass =
@@ -28,6 +29,8 @@ export function LeadCaptureForm({ visualizationRequestId }: { visualizationReque
       phone: String(formData.get("phone") ?? ""),
       business: String(formData.get("business") ?? ""),
       projectDescription: String(formData.get("projectDescription") ?? ""),
+      budgetRange: String(formData.get("budgetRange") ?? ""),
+      timeline: String(formData.get("timeline") ?? ""),
       visualizationRequestId,
       companyWebsite: String(formData.get("companyWebsite") ?? ""),
     };
@@ -69,7 +72,7 @@ export function LeadCaptureForm({ visualizationRequestId }: { visualizationReque
         <CheckCircle2 className="h-8 w-8 text-accent-2" aria-hidden="true" />
         <h4 className="font-display text-base font-semibold">Thanks — we&apos;ll be in touch</h4>
         <p className="max-w-xs text-sm text-muted">
-          We&apos;ve received your project details along with your concept image.
+          We&apos;ve received your project details along with your website concept.
         </p>
       </div>
     );
@@ -111,6 +114,35 @@ export function LeadCaptureForm({ visualizationRequestId }: { visualizationReque
             Phone
           </label>
           <input id="lead-phone" name="phone" type="tel" className={inputClass} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="lead-budgetRange" className={labelClass}>
+            Budget range
+          </label>
+          <select id="lead-budgetRange" name="budgetRange" className={inputClass} defaultValue="">
+            <option value="">Select a range</option>
+            {budgetRanges.map((range) => (
+              <option key={range} value={range}>
+                {range}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="lead-timeline" className={labelClass}>
+            Timeline
+          </label>
+          <select id="lead-timeline" name="timeline" className={inputClass} defaultValue="">
+            <option value="">Select a timeline</option>
+            {timelineOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

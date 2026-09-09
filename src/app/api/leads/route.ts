@@ -43,7 +43,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const { name, email, phone, business, projectDescription, visualizationRequestId } = parsed.data;
+  const { name, email, phone, business, projectDescription, budgetRange, timeline, visualizationRequestId } =
+    parsed.data;
 
   const { error } = await admin.from("leads").insert({
     name,
@@ -51,6 +52,8 @@ export async function POST(request: Request) {
     phone: phone || null,
     business: business || null,
     project_description: projectDescription || null,
+    budget_range: budgetRange || null,
+    timeline: timeline || null,
     visualization_request_id: visualizationRequestId || null,
   });
 
@@ -73,6 +76,8 @@ export async function POST(request: Request) {
         <p><strong>Email:</strong> ${escapeHtml(email)}</p>
         ${phone ? `<p><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ""}
         ${business ? `<p><strong>Business:</strong> ${escapeHtml(business)}</p>` : ""}
+        ${budgetRange ? `<p><strong>Budget:</strong> ${escapeHtml(budgetRange)}</p>` : ""}
+        ${timeline ? `<p><strong>Timeline:</strong> ${escapeHtml(timeline)}</p>` : ""}
         ${projectDescription ? `<p><strong>Notes:</strong></p><p>${escapeHtml(projectDescription).replace(/\n/g, "<br />")}</p>` : ""}
       `,
     });

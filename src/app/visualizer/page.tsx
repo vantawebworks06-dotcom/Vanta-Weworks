@@ -5,10 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { VisualizerExperience } from "@/components/visualizer/visualizer-experience";
 
 export const metadata: Metadata = {
-  title: "AI Website Idea Visualizer",
+  title: "AI Website Visualizer",
   description:
-    "Describe the website you have in mind and get an AI-generated visual concept in seconds — a signature Vanta Webworks tool.",
+    "Describe the website you have in mind and get an interactive, editable visual concept in seconds — a signature Vanta Webworks tool.",
   alternates: { canonical: "/visualizer" },
+  openGraph: {
+    title: "AI Website Visualizer | Vanta Webworks",
+    description:
+      "Describe the website you have in mind and get an interactive, editable visual concept in seconds.",
+  },
 };
 
 export default function VisualizerPage() {
@@ -23,12 +28,12 @@ export default function VisualizerPage() {
           Imagine Your Website Before We Build It.
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-muted">
-          Describe your vision and our AI will generate a visual concept in seconds — a fast,
-          free way to see your idea take shape before any commitment.
+          Describe your vision and get a real, interactive preview — scroll it, tweak the
+          colors, and ask our AI to change anything, all before any commitment.
         </p>
       </Container>
 
-      <Container className="mt-14 max-w-3xl">
+      <Container className="mt-14 max-w-5xl">
         <VisualizerExperience />
       </Container>
     </div>

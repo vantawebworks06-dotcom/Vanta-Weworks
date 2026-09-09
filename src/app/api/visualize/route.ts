@@ -2,21 +2,14 @@ import { NextResponse } from "next/server";
 import { visualizeRequestSchema } from "@/lib/validations/visualizer";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
-import {
-  moderateText,
-  generateConceptImage,
-  AiConfigError,
-  AiModerationError,
-  AiProviderError,
-  AiTimeoutError,
-} from "@/lib/ai/openai-image";
+import { moderateText } from "@/lib/ai/openai-image";
+import { generateWebsiteConcept } from "@/lib/ai/openai-concept";
+import { AiConfigError, AiModerationError, AiProviderError, AiTimeoutError, AiValidationError } from "@/lib/ai/errors";
 
 export async function POST(request: Request) {
   const ip = getClientIp(request.headers);
 
-  // Image generation costs real money per call, so this window is tighter
-  // than the plain contact-form limiter.
-  const { success } = rateLimit(`visualize:${ip}`, { limit: 6, windowMs: 60 * 60 * 1000 });
+  const { success } = rateLimit(`visualize:${ip}`, { limit: 10, windowMs: 60 * 60 * 1000 });
   if (!success) {
     return NextResponse.json(
       { error: "You've reached the generation limit for now. Please try again later." },
@@ -51,16 +44,14 @@ export async function POST(request: Request) {
     );
   }
 
-  // Record the attempt up front (status "pending"), then update it in place
-  // as the request progresses — one row per attempt, never duplicated.
   const { data: requestRow, error: insertError } = await admin
     .from("visualization_requests")
     .insert({
+      business_name: input.businessName,
       description: input.description,
       industry: input.industry || null,
       style: input.style || null,
       colors: input.colors || null,
-      target_audience: input.targetAudience || null,
       features: input.features || null,
       status: "pending",
     })
@@ -84,7 +75,7 @@ export async function POST(request: Request) {
       .eq("id", requestId);
   };
 
-  const combinedText = [input.description, input.industry, input.style, input.colors, input.targetAudience, input.features]
+  const combinedText = [input.businessName, input.description, input.industry, input.style, input.colors, input.features]
     .filter(Boolean)
     .join(" \n ");
 
@@ -107,34 +98,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { imageBytes, promptUsed } = await generateConceptImage(input);
-
-    const imagePath = `${requestId}.png`;
-    const { error: uploadError } = await admin.storage
-      .from("concepts")
-      .upload(imagePath, imageBytes, { contentType: "image/png", upsert: true });
-
-    if (uploadError) {
-      throw new Error(uploadError.message);
-    }
-
-    await admin.from("generated_concepts").insert({
-      visualization_request_id: requestId,
-      image_path: imagePath,
-    });
+    const concept = await generateWebsiteConcept(input);
 
     await admin
       .from("visualization_requests")
-      .update({ status: "completed", prompt_used: promptUsed })
+      .update({ status: "completed", config: concept })
       .eq("id", requestId);
 
-    const { data: publicUrlData } = admin.storage.from("concepts").getPublicUrl(imagePath);
-
-    return NextResponse.json({
-      requestId,
-      imageUrl: publicUrlData.publicUrl,
-      promptUsed,
-    });
+    return NextResponse.json({ requestId, concept });
   } catch (err) {
     console.error("Visualizer generation failed:", err);
     await fail(err instanceof Error ? err.message : "Unknown error");
@@ -151,9 +122,15 @@ export async function POST(request: Request) {
         { status: 504 }
       );
     }
+    if (err instanceof AiValidationError) {
+      return NextResponse.json(
+        { error: "We couldn't generate a valid concept from that description. Please try rephrasing it." },
+        { status: 502 }
+      );
+    }
     if (err instanceof AiProviderError) {
       return NextResponse.json(
-        { error: "The AI service couldn't generate an image right now. Please try again shortly." },
+        { error: "The AI service couldn't generate a concept right now. Please try again shortly." },
         { status: 502 }
       );
     }

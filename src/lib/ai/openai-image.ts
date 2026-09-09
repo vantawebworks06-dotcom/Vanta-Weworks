@@ -1,43 +1,15 @@
 import "server-only";
+import { OPENAI_API_BASE, withTimeout, getOpenAiKey, AiModerationError, AiProviderError } from "@/lib/ai/errors";
 
-const OPENAI_API_BASE = "https://api.openai.com/v1";
-const REQUEST_TIMEOUT_MS = 45_000;
-
-export class AiConfigError extends Error {}
-export class AiModerationError extends Error {}
-export class AiProviderError extends Error {}
-export class AiTimeoutError extends Error {}
-
-function getApiKey(): string {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) {
-    throw new AiConfigError("OPENAI_API_KEY is not configured.");
-  }
-  return key;
-}
-
-async function withTimeout<T>(fn: (signal: AbortSignal) => Promise<T>): Promise<T> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  try {
-    return await fn(controller.signal);
-  } catch (err) {
-    if (err instanceof DOMException && err.name === "AbortError") {
-      throw new AiTimeoutError("The AI service took too long to respond.");
-    }
-    throw err;
-  } finally {
-    clearTimeout(timeout);
-  }
-}
+export { AiConfigError, AiModerationError, AiProviderError, AiTimeoutError } from "@/lib/ai/errors";
 
 /**
  * Runs user-provided text through OpenAI's moderation endpoint before it's
- * ever used to build an image-generation prompt. Throws AiModerationError
- * if the content is flagged.
+ * ever used to build an image-generation or concept-generation prompt.
+ * Throws AiModerationError if the content is flagged.
  */
 export async function moderateText(text: string): Promise<void> {
-  const apiKey = getApiKey();
+  const apiKey = getOpenAiKey();
 
   const response = await withTimeout((signal) =>
     fetch(`${OPENAI_API_BASE}/moderations`, {
@@ -65,7 +37,7 @@ export async function moderateText(text: string): Promise<void> {
   }
 }
 
-export type ConceptInput = {
+export type ConceptImageInput = {
   description: string;
   industry?: string;
   style?: string;
@@ -74,7 +46,7 @@ export type ConceptInput = {
   features?: string;
 };
 
-export function buildConceptPrompt(input: ConceptInput): string {
+export function buildImagePrompt(input: ConceptImageInput): string {
   const parts = [
     `A professional website design concept mockup, shown as a modern browser window screenshot of a homepage${
       input.industry ? ` for a ${input.industry} business` : " for a business"
@@ -92,14 +64,12 @@ export function buildConceptPrompt(input: ConceptInput): string {
 }
 
 /**
- * Generates a single concept image and returns it as raw bytes (PNG) plus
- * the exact prompt that was used.
+ * Generates a single image and returns it as raw bytes (PNG) plus the exact
+ * prompt that was used. Used both for the (legacy) full-mockup image and,
+ * optionally, a single hero background image for a structured concept.
  */
-export async function generateConceptImage(
-  input: ConceptInput
-): Promise<{ imageBytes: Buffer; promptUsed: string }> {
-  const apiKey = getApiKey();
-  const promptUsed = buildConceptPrompt(input);
+export async function generateImage(prompt: string): Promise<Buffer> {
+  const apiKey = getOpenAiKey();
 
   const response = await withTimeout((signal) =>
     fetch(`${OPENAI_API_BASE}/images/generations`, {
@@ -110,7 +80,7 @@ export async function generateConceptImage(
       },
       body: JSON.stringify({
         model: "gpt-image-1",
-        prompt: promptUsed,
+        prompt,
         size: "1536x1024",
         n: 1,
       }),
@@ -132,5 +102,13 @@ export async function generateConceptImage(
     throw new AiProviderError("Image generation returned an unexpected response shape.");
   }
 
-  return { imageBytes: Buffer.from(b64, "base64"), promptUsed };
+  return Buffer.from(b64, "base64");
+}
+
+export async function generateConceptImage(
+  input: ConceptImageInput
+): Promise<{ imageBytes: Buffer; promptUsed: string }> {
+  const promptUsed = buildImagePrompt(input);
+  const imageBytes = await generateImage(promptUsed);
+  return { imageBytes, promptUsed };
 }

@@ -36,7 +36,7 @@ export default async function LeadsPage({
       .order("created_at", { ascending: false }),
     supabase
       .from("leads")
-      .select("id, name, email, business, project_description, is_handled, created_at")
+      .select("id, name, email, business, project_description, budget_range, timeline, is_handled, created_at")
       .order("created_at", { ascending: false }),
   ]);
 
@@ -136,6 +136,11 @@ export default async function LeadsPage({
                   <td className="px-5 py-4 text-xs text-muted">{row.business ?? "—"}</td>
                   <td className="max-w-xs px-5 py-4 text-xs text-foreground/85">
                     <p className="line-clamp-3">{row.project_description ?? "—"}</p>
+                    {row.budget_range || row.timeline ? (
+                      <p className="mt-1 text-[11px] text-muted">
+                        {[row.budget_range, row.timeline].filter(Boolean).join(" · ")}
+                      </p>
+                    ) : null}
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-xs text-muted">
                     {formatDate(row.created_at)}

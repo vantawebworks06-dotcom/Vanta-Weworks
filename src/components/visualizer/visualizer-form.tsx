@@ -23,11 +23,11 @@ export function VisualizerForm({
   errorMessage?: string | null;
 }) {
   const [values, setValues] = useState<VisualizerFormValues>({
+    businessName: initialValues?.businessName ?? "",
     description: initialValues?.description ?? "",
     industry: initialValues?.industry ?? "",
     style: initialValues?.style ?? "",
     colors: initialValues?.colors ?? "",
-    targetAudience: initialValues?.targetAudience ?? "",
     features: initialValues?.features ?? "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -38,12 +38,12 @@ export function VisualizerForm({
 
   function applyPreset(preset: (typeof visualizerPresets)[number]) {
     setValues({
+      businessName: preset.businessName,
       description: preset.description,
       industry: preset.industry,
       style: preset.style,
       colors: preset.colors,
-      targetAudience: "",
-      features: "",
+      features: preset.features,
     });
     setErrors({});
   }
@@ -82,8 +82,30 @@ export function VisualizerForm({
       </div>
 
       <div>
+        <label htmlFor="businessName" className={labelClass}>
+          Business name <span className="text-accent-2">*</span>
+        </label>
+        <input
+          id="businessName"
+          type="text"
+          required
+          value={values.businessName}
+          onChange={(e) => update("businessName", e.target.value)}
+          placeholder="e.g. Golden Palm"
+          className={inputClass}
+          aria-invalid={!!errors.businessName}
+          aria-describedby={errors.businessName ? "businessName-error" : undefined}
+        />
+        {errors.businessName ? (
+          <p id="businessName-error" className="mt-1 text-xs text-red-300">
+            {errors.businessName}
+          </p>
+        ) : null}
+      </div>
+
+      <div>
         <label htmlFor="description" className={labelClass}>
-          Describe your website or business <span className="text-accent-2">*</span>
+          Describe your website idea <span className="text-accent-2">*</span>
         </label>
         <textarea
           id="description"
@@ -125,7 +147,7 @@ export function VisualizerForm({
         </div>
         <div>
           <label htmlFor="style" className={labelClass}>
-            Desired style
+            Preferred style
           </label>
           <input
             id="style"
@@ -153,32 +175,18 @@ export function VisualizerForm({
           />
         </div>
         <div>
-          <label htmlFor="targetAudience" className={labelClass}>
-            Target audience
+          <label htmlFor="features" className={labelClass}>
+            Features you want
           </label>
           <input
-            id="targetAudience"
+            id="features"
             type="text"
-            value={values.targetAudience}
-            onChange={(e) => update("targetAudience", e.target.value)}
-            placeholder="e.g. Young professionals"
+            value={values.features}
+            onChange={(e) => update("features", e.target.value)}
+            placeholder="e.g. Online reservations, photo gallery, contact form"
             className={inputClass}
           />
         </div>
-      </div>
-
-      <div>
-        <label htmlFor="features" className={labelClass}>
-          Important features
-        </label>
-        <input
-          id="features"
-          type="text"
-          value={values.features}
-          onChange={(e) => update("features", e.target.value)}
-          placeholder="e.g. Online reservations, photo gallery, contact form"
-          className={inputClass}
-        />
       </div>
 
       {errorMessage ? (
@@ -193,7 +201,7 @@ export function VisualizerForm({
 
       <Button type="submit" variant="gradient" size="lg" className="w-full sm:w-fit">
         <Sparkles className="h-4 w-4" aria-hidden="true" />
-        Generate My Concept
+        Visualize My Website
       </Button>
     </form>
   );

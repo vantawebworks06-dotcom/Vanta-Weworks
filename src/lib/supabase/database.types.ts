@@ -148,6 +148,7 @@ export type Database = {
       }
       leads: {
         Row: {
+          budget_range: string | null
           business: string | null
           created_at: string
           email: string
@@ -156,9 +157,11 @@ export type Database = {
           name: string
           phone: string | null
           project_description: string | null
+          timeline: string | null
           visualization_request_id: string | null
         }
         Insert: {
+          budget_range?: string | null
           business?: string | null
           created_at?: string
           email: string
@@ -167,9 +170,11 @@ export type Database = {
           name: string
           phone?: string | null
           project_description?: string | null
+          timeline?: string | null
           visualization_request_id?: string | null
         }
         Update: {
+          budget_range?: string | null
           business?: string | null
           created_at?: string
           email?: string
@@ -178,6 +183,7 @@ export type Database = {
           name?: string
           phone?: string | null
           project_description?: string | null
+          timeline?: string | null
           visualization_request_id?: string | null
         }
         Relationships: [
@@ -410,9 +416,12 @@ export type Database = {
       }
       visualization_requests: {
         Row: {
+          business_name: string | null
           colors: string | null
+          config: Json | null
           created_at: string
           description: string
+          edit_count: number
           error_message: string | null
           features: string | null
           id: string
@@ -423,9 +432,12 @@ export type Database = {
           target_audience: string | null
         }
         Insert: {
+          business_name?: string | null
           colors?: string | null
+          config?: Json | null
           created_at?: string
           description: string
+          edit_count?: number
           error_message?: string | null
           features?: string | null
           id?: string
@@ -436,9 +448,12 @@ export type Database = {
           target_audience?: string | null
         }
         Update: {
+          business_name?: string | null
           colors?: string | null
+          config?: Json | null
           created_at?: string
           description?: string
+          edit_count?: number
           error_message?: string | null
           features?: string | null
           id?: string
