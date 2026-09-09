@@ -22,10 +22,10 @@ export const contactFormSchema = z.object({
 export type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 export const budgetRanges = [
-  "Under $1,500",
-  "$1,500 – $3,500",
-  "$3,500 – $7,500",
-  "$7,500+",
+  "Under $750",
+  "$750 – $1,500",
+  "$1,500 – $3,000",
+  "$3,000+",
   "Not sure yet",
 ] as const;
 

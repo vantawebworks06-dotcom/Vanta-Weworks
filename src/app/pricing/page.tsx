@@ -55,13 +55,22 @@ export default function PricingPage() {
                   <span className="ml-2 text-sm text-muted">{tier.cadence}</span>
                 </div>
                 <ul className="flex flex-1 flex-col gap-3">
-                  {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2.5 text-sm text-foreground/85">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-2" aria-hidden="true" />
-                      {feature}
-                    </li>
-                  ))}
+                  {tier.features.map((feature) =>
+                    feature.endsWith(":") ? (
+                      <li key={feature} className="pt-1 text-xs font-medium uppercase tracking-wide text-muted">
+                        {feature}
+                      </li>
+                    ) : (
+                      <li key={feature} className="flex items-start gap-2.5 text-sm text-foreground/85">
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-2" aria-hidden="true" />
+                        {feature}
+                      </li>
+                    )
+                  )}
                 </ul>
+                <p className="text-xs text-muted">
+                  Maintenance: <span className="text-foreground/80">{tier.maintenance}</span>
+                </p>
                 <Button
                   href="/contact"
                   variant={tier.featured ? "gradient" : "outline"}

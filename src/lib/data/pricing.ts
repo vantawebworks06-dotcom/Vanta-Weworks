@@ -1,8 +1,7 @@
 /**
- * Example starting packages. These are illustrative and meant to be
- * replaced with real pricing before launch — update the values below
- * (a future admin-managed pricing table is a reasonable next step if
- * prices need to change often without a code deploy).
+ * Real starting packages. Structured so prices and features can easily be
+ * changed later (a future admin-managed pricing table is a reasonable next
+ * step if prices need to change often without a code deploy).
  */
 
 export type PricingTier = {
@@ -12,6 +11,7 @@ export type PricingTier = {
   cadence: string;
   description: string;
   features: string[];
+  maintenance: string;
   featured?: boolean;
   cta: string;
 };
@@ -20,53 +20,70 @@ export const pricingTiers: PricingTier[] = [
   {
     slug: "starter",
     name: "Starter",
-    price: "$1,500",
-    cadence: "starting at",
-    description: "A focused, professional site for businesses getting online.",
+    price: "$650–$750",
+    cadence: "USD",
+    description: "Best for businesses looking for a professional online presence.",
     features: [
-      "Up to 5 pages",
-      "Custom responsive design",
-      "Contact form",
-      "Basic on-page SEO",
-      "2 rounds of revisions",
-      "2 weeks estimated timeline",
+      "1–4 pages",
+      "Mobile-responsive design",
+      "Custom website design",
+      "Contact/WhatsApp integration",
+      "Google Maps integration",
+      "Contact forms",
+      "Basic animations/interactions",
+      "Basic speed optimization",
+      "1–2 revisions",
     ],
+    maintenance: "Optional",
     cta: "Start Your Project",
   },
   {
     slug: "professional",
     name: "Professional",
-    price: "$3,500",
-    cadence: "starting at",
-    description: "A complete, conversion-focused site for growing businesses.",
+    price: "$1,200–$1,500",
+    cadence: "USD",
+    description: "Recommended for businesses looking for a more complete and advanced website.",
     features: [
-      "Up to 12 pages",
-      "Custom design system",
-      "Blog / content section",
-      "Advanced SEO setup",
-      "Performance optimization",
-      "4 rounds of revisions",
-      "3–4 weeks estimated timeline",
-      "30 days post-launch support",
+      "Everything in Starter, plus:",
+      "5–8 pages",
+      "Basic SEO",
+      "Google Business optimization",
+      "Advanced animations/interactions",
+      "Booking system",
+      "Blog/news section",
+      "Analytics",
+      "Improved speed optimization",
+      "3–5 revisions",
+      "Online payments available as an optional feature",
     ],
+    maintenance: "Optional",
     featured: true,
     cta: "Start Your Project",
   },
   {
-    slug: "premium",
-    name: "Premium",
-    price: "Custom",
-    cadence: "quote based on scope",
-    description: "E-commerce, custom applications, and complex builds.",
+    slug: "custom",
+    name: "Custom",
+    price: "$3,000+",
+    cadence: "USD",
+    description: "For businesses that want a complete, high-end website with advanced functionality.",
     features: [
-      "Unlimited pages / custom scope",
-      "E-commerce or custom web application",
-      "Third-party integrations",
-      "Admin dashboard where needed",
-      "Dedicated project management",
-      "Priority support",
-      "Ongoing maintenance available",
+      "8+ pages",
+      "Fully custom design",
+      "Mobile-responsive",
+      "WhatsApp/contact integration",
+      "Google Maps",
+      "Contact forms",
+      "Advanced SEO",
+      "Google Business optimization",
+      "Premium animations/interactions",
+      "Booking system",
+      "Online payments",
+      "Blog/news section",
+      "Analytics",
+      "Advanced speed optimization",
+      "Unlimited revisions during development",
     ],
+    maintenance: "1–3 months included",
     cta: "Request a Custom Quote",
   },
 ];

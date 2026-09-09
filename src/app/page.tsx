@@ -22,12 +22,12 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <VisualizerCallout />
       <TrustBar />
       <ServicesOverview />
       <WhyUs />
       <FeaturedProjects />
       <Process />
-      <VisualizerCallout />
       <Testimonials />
       <PricingOverview />
       <Faq />
