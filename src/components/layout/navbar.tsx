@@ -39,6 +39,10 @@ export function Navbar() {
     };
   }, [open]);
 
+  // The admin dashboard has its own app shell (sidebar + top bar) — the
+  // public marketing nav doesn't belong there.
+  if (pathname?.startsWith("/admin")) return null;
+
   return (
     <header
       className={cn(

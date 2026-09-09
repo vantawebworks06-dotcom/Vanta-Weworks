@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { contactFormSchema } from "@/lib/validations/contact";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { sendEmail, escapeHtml } from "@/lib/email/send-email";
 
 export async function POST(request: Request) {
   const ip = getClientIp(request.headers);
@@ -56,6 +57,40 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+
+  // Best-effort notifications — sendEmail() no-ops safely if RESEND_API_KEY
+  // isn't configured, and never throws, so this never blocks the response.
+  const notifyAddress = process.env.CONTACT_EMAIL;
+  if (notifyAddress) {
+    void sendEmail({
+      to: notifyAddress,
+      subject: `New inquiry from ${name}`,
+      html: `
+        <h2>New contact/quote inquiry</h2>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        ${phone ? `<p><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ""}
+        ${company ? `<p><strong>Company:</strong> ${escapeHtml(company)}</p>` : ""}
+        ${websiteUrl ? `<p><strong>Website:</strong> ${escapeHtml(websiteUrl)}</p>` : ""}
+        ${serviceInterested ? `<p><strong>Service:</strong> ${escapeHtml(serviceInterested)}</p>` : ""}
+        ${budgetRange ? `<p><strong>Budget:</strong> ${escapeHtml(budgetRange)}</p>` : ""}
+        ${preferredTimeline ? `<p><strong>Timeline:</strong> ${escapeHtml(preferredTimeline)}</p>` : ""}
+        <p><strong>Project description:</strong></p>
+        <p>${escapeHtml(message).replace(/\n/g, "<br />")}</p>
+      `,
+    });
+  }
+
+  void sendEmail({
+    to: email,
+    subject: "We've received your project inquiry — Vanta Webworks",
+    html: `
+      <p>Hi ${escapeHtml(name)},</p>
+      <p>Thanks for reaching out to Vanta Webworks. We've received your project details and
+      will follow up within one business day.</p>
+      <p>— The Vanta Webworks team</p>
+    `,
+  });
 
   return NextResponse.json({ ok: true });
 }

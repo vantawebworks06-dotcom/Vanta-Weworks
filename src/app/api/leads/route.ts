@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { leadCaptureSchema } from "@/lib/validations/visualizer";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendEmail, escapeHtml } from "@/lib/email/send-email";
 
 export async function POST(request: Request) {
   const ip = getClientIp(request.headers);
@@ -59,6 +60,22 @@ export async function POST(request: Request) {
       { error: "Something went wrong on our end. Please try again shortly." },
       { status: 500 }
     );
+  }
+
+  const notifyAddress = process.env.CONTACT_EMAIL;
+  if (notifyAddress) {
+    void sendEmail({
+      to: notifyAddress,
+      subject: `New AI Visualizer lead from ${name}`,
+      html: `
+        <h2>New AI Visualizer lead</h2>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        ${phone ? `<p><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ""}
+        ${business ? `<p><strong>Business:</strong> ${escapeHtml(business)}</p>` : ""}
+        ${projectDescription ? `<p><strong>Notes:</strong></p><p>${escapeHtml(projectDescription).replace(/\n/g, "<br />")}</p>` : ""}
+      `,
+    });
   }
 
   return NextResponse.json({ ok: true });

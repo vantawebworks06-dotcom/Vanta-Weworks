@@ -14,11 +14,12 @@ export type Project = {
   results: string | null;
   project_url: string | null;
   is_placeholder: boolean;
+  is_published: boolean;
   display_order: number;
 };
 
 const PROJECT_COLUMNS =
-  "id, slug, title, summary, content, cover_image_path, client_name, industry, services_provided, technologies, results, project_url, is_placeholder, display_order";
+  "id, slug, title, summary, content, cover_image_path, client_name, industry, services_provided, technologies, results, project_url, is_placeholder, is_published, display_order";
 
 export async function getProjects(): Promise<Project[]> {
   const supabase = await createClient();

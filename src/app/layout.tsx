@@ -4,6 +4,7 @@ import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import { siteConfig } from "@/lib/site-config";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { HideOnAdmin } from "@/components/layout/hide-on-admin";
 import { OrganizationJsonLd } from "@/components/seo/organization-jsonld";
 import "./globals.css";
 
@@ -82,7 +83,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <main id="main-content" className="flex flex-1 flex-col">
           {children}
         </main>
-        <Footer />
+        <HideOnAdmin>
+          <Footer />
+        </HideOnAdmin>
       </body>
     </html>
   );

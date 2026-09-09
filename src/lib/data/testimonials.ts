@@ -9,13 +9,14 @@ export type Testimonial = {
   rating: number;
   avatar_url: string | null;
   is_placeholder: boolean;
+  is_published: boolean;
 };
 
 export async function getTestimonials(): Promise<Testimonial[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("testimonials")
-    .select("id, client_name, client_title, company, quote, rating, avatar_url, is_placeholder")
+    .select("id, client_name, client_title, company, quote, rating, avatar_url, is_placeholder, is_published")
     .eq("is_published", true)
     .order("display_order", { ascending: true });
 
