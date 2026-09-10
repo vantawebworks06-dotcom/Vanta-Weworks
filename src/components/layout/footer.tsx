@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { siteConfig, footerNav, mainNav } from "@/lib/site-config";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/layout/logo";
@@ -119,6 +119,19 @@ export function Footer() {
                 >
                   <Phone className="h-4 w-4 shrink-0" aria-hidden="true" />
                   {siteConfig.contact.phone}
+                </a>
+              </li>
+            ) : null}
+            {siteConfig.contact.whatsapp ? (
+              <li>
+                <a
+                  href={`https://wa.me/${siteConfig.contact.whatsapp.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-muted transition-colors hover:text-foreground"
+                >
+                  <MessageCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  WhatsApp
                 </a>
               </li>
             ) : null}

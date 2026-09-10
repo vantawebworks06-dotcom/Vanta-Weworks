@@ -54,7 +54,12 @@ export default async function ProjectDetailPage({
         </Reveal>
 
         <Reveal delay={80} className="mt-10">
-          <ProjectPreview seed={project.slug} label={project.industry ?? project.title} className="w-full" />
+          <ProjectPreview
+            seed={project.slug}
+            label={project.industry ?? project.title}
+            coverImagePath={project.cover_image_path}
+            className="w-full"
+          />
         </Reveal>
 
         <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_320px]">

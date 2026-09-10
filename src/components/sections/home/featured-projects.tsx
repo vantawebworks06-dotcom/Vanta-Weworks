@@ -26,7 +26,11 @@ export async function FeaturedProjects() {
           {projects.map((project, i) => (
             <Reveal key={project.id} delay={i * 100}>
               <Link href={`/portfolio/${project.slug}`} className="group block h-full">
-                <ProjectPreview seed={project.slug} label={project.industry ?? project.title} />
+                <ProjectPreview
+                  seed={project.slug}
+                  label={project.industry ?? project.title}
+                  coverImagePath={project.cover_image_path}
+                />
                 <div className="mt-5 flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">

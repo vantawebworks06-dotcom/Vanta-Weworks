@@ -108,7 +108,11 @@ export function Navbar() {
             >
               <UserCircle className="h-5 w-5" aria-hidden="true" />
             </Link>
-          ) : null}
+          ) : (
+            <Button href="/login" variant="ghost" size="sm">
+              Log In
+            </Button>
+          )}
           <Button href="/contact" variant="gradient" size="sm">
             Start Your Project
           </Button>
@@ -162,7 +166,17 @@ export function Navbar() {
               <UserCircle className="h-4 w-4" aria-hidden="true" />
               My Account
             </Link>
-          ) : null}
+          ) : (
+            <Link
+              href="/login"
+              className={cn(
+                "rounded-lg px-3 py-3 text-base font-medium transition-colors",
+                pathname === "/login" ? "bg-white/5 text-foreground" : "text-muted hover:text-foreground"
+              )}
+            >
+              Log In
+            </Link>
+          )}
           <Button href="/contact" variant="gradient" size="md" className="mt-3 w-full">
             Start Your Project
           </Button>
