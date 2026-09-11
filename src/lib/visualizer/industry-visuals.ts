@@ -12,6 +12,7 @@ import type { IndustryKey } from "@/lib/validations/concept";
  */
 export const INDUSTRY_KEYWORDS: Record<IndustryKey, string[]> = {
   automotive: ["car dealership", "car showroom", "luxury car", "sports car", "car lot"],
+  "car-rental": ["rental car fleet", "suv rental", "convertible car", "car rental agency", "tropical road trip"],
   "auto-repair": ["auto repair shop", "mechanic garage", "car engine", "car service"],
   "restaurant-pizza": ["pizza", "pizzeria", "italian restaurant", "wood fired pizza"],
   "restaurant-general": ["restaurant food", "fine dining", "restaurant interior", "gourmet plate"],
@@ -41,6 +42,41 @@ export const INDUSTRY_KEYWORDS: Record<IndustryKey, string[]> = {
   general: ["modern office", "business meeting", "professional team", "office building"],
 };
 
+/** Human-readable label per industry key, for the visualizer's debug panel
+ * and anywhere else a person (not just the render code) needs to see what
+ * category the AI actually classified the business as. */
+export const INDUSTRY_LABELS: Record<IndustryKey, string> = {
+  automotive: "Automotive / Car Dealership",
+  "car-rental": "Car Rental",
+  "auto-repair": "Auto Repair / Mechanic",
+  "restaurant-pizza": "Restaurant — Pizza",
+  "restaurant-general": "Restaurant",
+  "bakery-cafe": "Bakery / Café",
+  "bar-nightlife": "Bar / Nightlife",
+  construction: "Construction",
+  "real-estate": "Real Estate",
+  barber: "Barber Shop",
+  "beauty-salon": "Beauty Salon / Spa",
+  "gym-fitness": "Gym / Fitness",
+  "hotel-hospitality": "Hotel / Hospitality",
+  "clothing-fashion": "Clothing / Fashion",
+  legal: "Legal Services",
+  dental: "Dental",
+  "medical-health": "Medical / Healthcare",
+  cleaning: "Cleaning Services",
+  landscaping: "Landscaping",
+  events: "Events",
+  photography: "Photography",
+  electronics: "Electronics",
+  travel: "Travel",
+  education: "Education",
+  "technology-saas": "Technology / SaaS",
+  "home-services": "Home Services",
+  "retail-general": "Retail",
+  nonprofit: "Nonprofit",
+  general: "General Business",
+};
+
 function hashSeed(seed: string): number {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
@@ -56,12 +92,47 @@ export function imageKeywordFor(industryKey: IndustryKey, seed: string): string 
 }
 
 /**
+ * LoremFlickr expects a comma-separated list of single-word tags in the URL
+ * path (e.g. "/900/700/car,rental"), matching photos tagged with ALL of
+ * them — not a %20-encoded phrase. A URL-encoded multi-word phrase (e.g.
+ * "car%20rental") reliably fails outright rather than degrading gracefully,
+ * which is exactly what most of our curated keywords are ("car dealership",
+ * "construction site", ...), since they read naturally as phrases. Convert
+ * here rather than rewriting every keyword list as literal tag arrays.
+ */
+function toTagPath(keyword: string): string {
+  return keyword
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => encodeURIComponent(word))
+    .join(",");
+}
+
+/**
  * Builds a URL for an illustrative stock photo matching the industry, via
  * LoremFlickr — a free, keyless, keyword-based placeholder photo service.
  * This is demo/illustrative imagery for the concept preview only, never
  * presented as the visitor's actual business photos.
+ *
+ * LoremFlickr is best-effort and can fail a fetch outright, not just be
+ * slow. `viaProxy` routes the same request through images.weserv.nl, a
+ * separate, independent image CDN/proxy — different DNS, different edge
+ * network — as a second attempt with a real chance of succeeding when a
+ * direct hit didn't, rather than retrying the exact same path twice. See
+ * GradientPlaceholder, which uses this for its one retry after a direct
+ * attempt fails.
  */
-export function stockImageUrl(industryKey: IndustryKey, seed: string, width: number, height: number): string {
-  const keyword = imageKeywordFor(industryKey, seed);
-  return `https://loremflickr.com/${Math.round(width)}/${Math.round(height)}/${encodeURIComponent(keyword)}`;
+export function stockImageUrl(
+  industryKey: IndustryKey,
+  seed: string,
+  width: number,
+  height: number,
+  viaProxy = false
+): string {
+  const tagPath = toTagPath(imageKeywordFor(industryKey, seed));
+  const w = Math.round(width);
+  const h = Math.round(height);
+  const direct = `https://loremflickr.com/${w}/${h}/${tagPath}`;
+  if (!viaProxy) return direct;
+  return `https://images.weserv.nl/?url=${encodeURIComponent(`loremflickr.com/${w}/${h}/${tagPath}`)}&w=${w}&h=${h}&fit=cover`;
 }

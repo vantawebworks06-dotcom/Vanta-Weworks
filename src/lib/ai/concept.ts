@@ -44,7 +44,7 @@ matching exactly this shape:
     "buttonStyle": "solid" | "outline" | "gradient" | "pill",
     "fontStyle": "modern" | "classic" | "elegant" | "minimal" | "bold"
   },
-  "sections": [ 3 to 7 of the following, always starting with exactly one "hero" ]
+  "sections": [ 5 to 8 of the following, always starting with exactly one "hero" ]
 }
 
 Section shapes (every section needs a short unique "id" string):
@@ -53,14 +53,26 @@ Section shapes (every section needs a short unique "id" string):
 - about: { "id", "type":"about", "heading", "description" }
 - testimonials: { "id", "type":"testimonials", "variant":"cards"|"carousel", "heading"?, "items":[{ "name","role"?,"quote","rating"? }] (1-6 items; "rating" is a whole number 1-5) }
 - gallery: { "id", "type":"gallery", "variant":"grid"|"masonry", "heading"?, "imageCount" (1-9) }
+- faq: { "id", "type":"faq", "heading"?, "items":[{ "question","answer" }] (2-6 items) }
 - cta: { "id", "type":"cta", "heading", "description"?, "buttonLabel" }
 - contact: { "id", "type":"contact", "heading"?, "description"?, "showForm", "whatsapp" }
+
+SECTION SELECTION: use 5-8 sections and vary which ones you pick based on what actually suits
+this business — don't default to the same handful every time. A listing-driven business
+(car dealership, restaurant, hotel, real estate) should lean on the services/features listing
+plus about/testimonials/cta/contact; a service business people have questions before booking
+(barber, gym, contractor, medical/dental, legal) benefits from an faq section; a visual business
+(real estate, hotel, construction, photography, barber, salon) benefits from a gallery. Pick the
+combination and ORDER that make sense for how a visitor would actually use this specific site,
+not a fixed template.
 
 INDUSTRY CLASSIFICATION: pick the "industryKey" that best matches the business — it drives
 which photography shows up in the preview, so get it as specific as the list allows (e.g. a
 pizza place is "restaurant-pizza", not "restaurant-general"; a nightclub is "bar-nightlife",
-not "events"). If the description is too vague to tell, use "general" and keep the rest of the
-concept polished and neutral rather than guessing wildly.
+not "events"; a company that rents cars to customers is "car-rental", NOT "automotive"
+(car dealership) or "auto-repair" (a repair shop) — read what the business actually DOES, not
+just that the word "car" appears). If the description is too vague to tell, use "general" and
+keep the rest of the concept polished and neutral rather than guessing wildly.
 
 MAKE IT LOOK LIKE THEIR BUSINESS, NOT A TEMPLATE: prioritize specific details in the
 description over the coarse industry/style/colors fields — if the visitor mentions a specific
@@ -74,6 +86,7 @@ section a listing: give each item a realistic, clearly-illustrative "price" (e.g
 sqft", "Serves 2"), and a "ctaLabel" matching the action (e.g. "View Vehicle", "Order Now",
 "View Property", "Book Now"), and set that section's "isSampleData" to true. Examples:
 - Car dealership / auto sales -> vehicle listings with year/make/model, price, mileage, "View Vehicle"
+- Car rental -> vehicle listings with daily/weekly rate in "price", transmission/seats in "meta", "Book Now"
 - Restaurant/pizza/cafe -> menu items with price, "Order Now"
 - Real estate -> property listings with price, beds/baths/sqft in "meta", "View Property"
 - Hotel -> room types with nightly price, "meta" amenities, "Book Now"

@@ -44,6 +44,7 @@ export type Theme = z.infer<typeof themeSchema>;
  */
 export const industryKeys = [
   "automotive",
+  "car-rental",
   "auto-repair",
   "restaurant-pizza",
   "restaurant-general",
@@ -175,6 +176,18 @@ export const contactSectionSchema = z.object({
   whatsapp: looseBoolean(false),
 });
 
+export const faqItemSchema = z.object({
+  question: z.string().min(1).max(160),
+  answer: z.string().min(1).max(400),
+});
+
+export const faqSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal("faq"),
+  heading: z.string().max(120).optional(),
+  items: z.array(faqItemSchema).min(2).max(6),
+});
+
 export const sectionSchema = z.discriminatedUnion("type", [
   heroSectionSchema,
   servicesSectionSchema,
@@ -183,6 +196,7 @@ export const sectionSchema = z.discriminatedUnion("type", [
   gallerySectionSchema,
   ctaSectionSchema,
   contactSectionSchema,
+  faqSectionSchema,
 ]);
 
 export type Section = z.infer<typeof sectionSchema>;
@@ -193,6 +207,7 @@ export type TestimonialsSection = z.infer<typeof testimonialsSectionSchema>;
 export type GallerySection = z.infer<typeof gallerySectionSchema>;
 export type CtaSection = z.infer<typeof ctaSectionSchema>;
 export type ContactSection = z.infer<typeof contactSectionSchema>;
+export type FaqSection = z.infer<typeof faqSectionSchema>;
 
 export const websiteConceptSchema = z.object({
   businessName: z.string().min(1).max(100),

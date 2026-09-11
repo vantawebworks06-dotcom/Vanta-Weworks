@@ -1,7 +1,10 @@
+"use client";
+
 import type { CtaSection } from "@/lib/validations/concept";
 import { usePreviewTheme, buttonStyle, fontFamilyFor, headingWeightFor, readableTextOn } from "@/components/visualizer/preview/theme-context";
+import { scrollToSection } from "@/components/visualizer/preview/section-nav";
 
-export function CtaPreview({ section }: { section: CtaSection }) {
+export function CtaPreview({ section, targetId }: { section: CtaSection; targetId?: string | null }) {
   const theme = usePreviewTheme();
   const textColor = readableTextOn(theme.primaryColor);
 
@@ -24,6 +27,7 @@ export function CtaPreview({ section }: { section: CtaSection }) {
         ) : null}
         <button
           type="button"
+          onClick={() => scrollToSection(targetId)}
           className="mt-7 px-7 py-3.5 text-sm font-medium transition-transform hover:scale-[1.03]"
           style={{ ...buttonStyle(theme, "primary"), background: textColor === "#ffffff" ? "#ffffff" : "#111111", color: textColor === "#ffffff" ? "#111111" : "#ffffff" }}
         >

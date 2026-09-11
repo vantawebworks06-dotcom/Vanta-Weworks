@@ -1,8 +1,19 @@
+"use client";
+
 import type { HeroSection } from "@/lib/validations/concept";
 import { usePreviewTheme, buttonStyle, fontFamilyFor, headingWeightFor, readableTextOn } from "@/components/visualizer/preview/theme-context";
 import { GradientPlaceholder } from "@/components/visualizer/preview/gradient-placeholder";
+import { scrollToSection } from "@/components/visualizer/preview/section-nav";
 
-export function HeroPreview({ section }: { section: HeroSection }) {
+export function HeroPreview({
+  section,
+  primaryTargetId,
+  secondaryTargetId,
+}: {
+  section: HeroSection;
+  primaryTargetId?: string | null;
+  secondaryTargetId?: string | null;
+}) {
   const theme = usePreviewTheme();
   const onDark = readableTextOn(theme.primaryColor) === "#ffffff";
 
@@ -25,11 +36,21 @@ export function HeroPreview({ section }: { section: HeroSection }) {
             {section.description}
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <button type="button" className="px-6 py-3 text-sm font-medium transition-transform hover:scale-[1.03]" style={buttonStyle(theme, "primary")}>
+            <button
+              type="button"
+              onClick={() => scrollToSection(primaryTargetId)}
+              className="px-6 py-3 text-sm font-medium transition-transform hover:scale-[1.03]"
+              style={buttonStyle(theme, "primary")}
+            >
               {section.primaryCta}
             </button>
             {section.secondaryCta ? (
-              <button type="button" className="px-6 py-3 text-sm font-medium transition-opacity hover:opacity-80" style={{ color: theme.textColor, background: "transparent", border: `1px solid ${theme.textColor}33` }}>
+              <button
+                type="button"
+                onClick={() => scrollToSection(secondaryTargetId)}
+                className="px-6 py-3 text-sm font-medium transition-opacity hover:opacity-80"
+                style={{ color: theme.textColor, background: "transparent", border: `1px solid ${theme.textColor}33` }}
+              >
                 {section.secondaryCta}
               </button>
             ) : null}
@@ -79,12 +100,18 @@ export function HeroPreview({ section }: { section: HeroSection }) {
           {section.description}
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <button type="button" className="px-7 py-3.5 text-sm font-medium transition-transform hover:scale-[1.03]" style={buttonStyle(theme, "primary")}>
+          <button
+            type="button"
+            onClick={() => scrollToSection(primaryTargetId)}
+            className="px-7 py-3.5 text-sm font-medium transition-transform hover:scale-[1.03]"
+            style={buttonStyle(theme, "primary")}
+          >
             {section.primaryCta}
           </button>
           {section.secondaryCta ? (
             <button
               type="button"
+              onClick={() => scrollToSection(secondaryTargetId)}
               className="px-7 py-3.5 text-sm font-medium transition-opacity hover:opacity-80"
               style={{
                 color: section.variant === "luxury" || section.variant === "bold" ? (onDark ? "#fff" : "#111") : theme.textColor,

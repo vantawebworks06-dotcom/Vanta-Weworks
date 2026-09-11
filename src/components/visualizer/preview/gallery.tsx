@@ -28,6 +28,12 @@ export function GalleryPreview({ section }: { section: GallerySection }) {
             <GradientPlaceholder
               key={i}
               seed={`${section.id}-${i}`}
+              // Cap real photo fetches to the first 4 tiles — plenty for the
+              // visual effect without bursting a dozen+ concurrent requests
+              // at the free photo source when combined with the rest of the
+              // page's imagery; later tiles still get a themed gradient.
+              photo={i < 4}
+              delayMs={i * 150}
               className={
                 section.variant === "masonry"
                   ? `mb-3 w-full break-inside-avoid ${i % 3 === 0 ? "aspect-[3/4]" : "aspect-square"}`

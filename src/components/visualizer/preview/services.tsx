@@ -88,7 +88,7 @@ export function ServicesPreview({ section }: { section: ServicesSection }) {
                 }
               >
                 {isListing ? (
-                  <GradientPlaceholder seed={`${section.id}-${i}`} className="aspect-[4/3] w-full" />
+                  <GradientPlaceholder seed={`${section.id}-${i}`} delayMs={i * 150} className="aspect-[4/3] w-full" />
                 ) : null}
                 <div className="p-6">
                   {!isListing ? (

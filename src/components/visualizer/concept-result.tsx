@@ -7,6 +7,7 @@ import { PreviewFrame } from "@/components/visualizer/preview/preview-frame";
 import { DeviceSwitcher, type Device } from "@/components/visualizer/device-switcher";
 import { DesignControls } from "@/components/visualizer/design-controls";
 import { EditBar } from "@/components/visualizer/edit-bar";
+import { DebugPanel } from "@/components/visualizer/debug-panel";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -46,11 +47,13 @@ export function ConceptResult({
       <div className="flex items-start gap-3 rounded-xl border border-border bg-surface/40 p-4 text-sm text-muted">
         <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-accent-2" aria-hidden="true" />
         <p>
-          <span className="font-medium text-foreground">This is a preview concept</span>, not the
-          final representation of your website. Your final website will be customized and
-          refined based on your business, content, branding, and requirements.
+          <span className="font-medium text-foreground">AI Preview</span> — this is a visual
+          concept, not the final website. Your finished website will be customized and refined
+          based on your business, branding, content, features, and requirements.
         </p>
       </div>
+
+      <DebugPanel concept={concept} />
 
       <Card className="overflow-hidden p-0">
         <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
