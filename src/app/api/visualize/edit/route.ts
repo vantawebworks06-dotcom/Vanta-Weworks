@@ -2,9 +2,13 @@ import { NextResponse } from "next/server";
 import { editConceptSchema } from "@/lib/validations/visualizer";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { moderateText } from "@/lib/ai/openai-image";
-import { editWebsiteConcept } from "@/lib/ai/openai-concept";
+import { moderateText } from "@/lib/ai/moderation";
+import { editWebsiteConcept } from "@/lib/ai/concept";
 import { AiConfigError, AiModerationError, AiProviderError, AiTimeoutError, AiValidationError } from "@/lib/ai/errors";
+
+// See src/app/api/visualize/route.ts for why this needs more than the
+// platform default.
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const ip = getClientIp(request.headers);

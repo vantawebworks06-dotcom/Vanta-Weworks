@@ -43,10 +43,10 @@ export default function TermsPage() {
               AI Website Idea Visualizer
             </h2>
             <p className="mt-3">
-              The Visualizer generates illustrative concept images based on your description
-              using a third-party AI image-generation service. Generated images are
-              illustrative only, are not a guarantee of final design or development output,
-              and should not be treated as a finished deliverable.
+              The Visualizer generates an illustrative website concept — layout, color
+              palette, and copy — based on your description, using a third-party AI service.
+              The generated concept is illustrative only, is not a guarantee of final design
+              or development output, and should not be treated as a finished deliverable.
             </p>
           </section>
 

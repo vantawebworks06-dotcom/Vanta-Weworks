@@ -63,7 +63,15 @@ export const testimonialItemSchema = z.object({
   name: z.string().min(1).max(80),
   role: z.string().max(100).optional(),
   quote: z.string().min(1).max(400),
-  rating: z.number().int().min(1).max(5).optional(),
+  // Coerce rather than hard-reject an imperfect rating (e.g. an AI response
+  // of 4.5, or "5" as a string) — the model's intent is clear even when the
+  // exact type/value isn't, so normalize instead of failing the whole
+  // generation.
+  rating: z.coerce
+    .number()
+    .optional()
+    .catch(undefined)
+    .transform((n) => (typeof n === "number" && !Number.isNaN(n) ? Math.min(5, Math.max(1, Math.round(n))) : undefined)),
 });
 
 export const testimonialsSectionSchema = z.object({

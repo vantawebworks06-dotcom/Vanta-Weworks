@@ -69,8 +69,8 @@ export default function PrivacyPage() {
             <p className="mt-3">
               We may use third-party services to operate this website, including hosting
               (Vercel), database and authentication (Supabase), transactional email
-              delivery, and AI image generation for the Website Idea Visualizer. These
-              providers process data only as necessary to provide their service to us.
+              delivery, and AI-powered concept generation for the Website Idea Visualizer.
+              These providers process data only as necessary to provide their service to us.
             </p>
           </section>
 

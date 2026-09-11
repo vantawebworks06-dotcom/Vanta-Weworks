@@ -44,9 +44,9 @@ export default function AdminSettingsPage() {
       hint: "SUPABASE_SERVICE_ROLE_KEY — required for the AI Visualizer to save requests/leads",
     },
     {
-      label: "OpenAI API key",
-      configured: !!process.env.OPENAI_API_KEY,
-      hint: "OPENAI_API_KEY — required for the AI Visualizer to generate images",
+      label: "Groq API key",
+      configured: !!process.env.GROQ_API_KEY,
+      hint: "GROQ_API_KEY — required for the AI Visualizer to generate and edit concepts",
     },
     {
       label: "Contact email",

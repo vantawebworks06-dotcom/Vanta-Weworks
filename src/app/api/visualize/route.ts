@@ -3,9 +3,14 @@ import { visualizeRequestSchema } from "@/lib/validations/visualizer";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { moderateText } from "@/lib/ai/openai-image";
-import { generateWebsiteConcept } from "@/lib/ai/openai-concept";
+import { moderateText } from "@/lib/ai/moderation";
+import { generateWebsiteConcept } from "@/lib/ai/concept";
 import { AiConfigError, AiModerationError, AiProviderError, AiTimeoutError, AiValidationError } from "@/lib/ai/errors";
+
+// Moderation + concept generation can each take a couple of retried/backed-off
+// AI calls (see src/lib/ai/errors.ts) — give this route more headroom than
+// the platform default so a slow-but-succeeding request isn't cut off.
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const ip = getClientIp(request.headers);
