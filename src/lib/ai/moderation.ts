@@ -5,6 +5,7 @@ import {
   getGroqApiKey,
   parseRetryAfterMs,
   sleep,
+  MAX_BACKOFF_MS,
   AiModerationError,
   AiProviderError,
   AiRateLimitError,
@@ -109,7 +110,7 @@ export async function moderateText(text: string): Promise<void> {
     result = await classify(text);
   } catch (err) {
     if (err instanceof AiRateLimitError) {
-      await sleep(err.retryAfterMs);
+      await sleep(Math.min(err.retryAfterMs, MAX_BACKOFF_MS));
       result = await classify(text);
     } else if (err instanceof AiProviderError) {
       result = await classify(text);

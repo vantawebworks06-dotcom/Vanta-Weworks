@@ -5,7 +5,15 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { moderateText } from "@/lib/ai/moderation";
 import { generateWebsiteConcept } from "@/lib/ai/concept";
-import { AiConfigError, AiModerationError, AiProviderError, AiTimeoutError, AiValidationError } from "@/lib/ai/errors";
+import {
+  AiConfigError,
+  AiModerationError,
+  AiProviderError,
+  AiRateLimitError,
+  AiTimeoutError,
+  AiValidationError,
+  formatRetryMessage,
+} from "@/lib/ai/errors";
 
 // Moderation + concept generation can each take a couple of retried/backed-off
 // AI calls (see src/lib/ai/errors.ts) — give this route more headroom than
@@ -109,6 +117,9 @@ export async function POST(request: Request) {
         { status: 503 }
       );
     }
+    if (err instanceof AiRateLimitError) {
+      return NextResponse.json({ error: formatRetryMessage(err.retryAfterMs) }, { status: 429 });
+    }
     return NextResponse.json(
       { error: "The AI Visualizer isn't available right now. Please try again shortly." },
       { status: 503 }
@@ -145,6 +156,9 @@ export async function POST(request: Request) {
         { error: "We couldn't generate a valid concept from that description. Please try rephrasing it." },
         { status: 502 }
       );
+    }
+    if (err instanceof AiRateLimitError) {
+      return NextResponse.json({ error: formatRetryMessage(err.retryAfterMs) }, { status: 429 });
     }
     if (err instanceof AiProviderError) {
       return NextResponse.json(

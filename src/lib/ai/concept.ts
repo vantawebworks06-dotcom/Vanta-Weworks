@@ -5,6 +5,7 @@ import {
   getGroqApiKey,
   parseRetryAfterMs,
   sleep,
+  MAX_BACKOFF_MS,
   AiProviderError,
   AiRateLimitError,
   AiValidationError,
@@ -12,6 +13,7 @@ import {
 import {
   websiteConceptSchema,
   ensureSectionIds,
+  industryKeys,
   type WebsiteConcept,
 } from "@/lib/validations/concept";
 
@@ -22,14 +24,17 @@ import {
 // limit is too low for a response this size. See console.groq.com.
 const MODEL = "openai/gpt-oss-20b";
 
+const INDUSTRY_KEY_LIST = industryKeys.join(", ");
+
 const SCHEMA_GUIDE = `
-You design website concepts for a web design agency's "AI Website Visualizer" tool.
-Given a description of a business, respond with ONLY a JSON object (no prose, no markdown
-fences) matching exactly this shape:
+You design website concepts for a web design agency's "AI Website Visualizer" tool. Given a
+description of a business, respond with ONLY a JSON object (no prose, no markdown fences)
+matching exactly this shape:
 
 {
   "businessName": string,
   "style": string,               // short label, e.g. "luxury", "minimal", "playful", "corporate"
+  "industryKey": one of [${INDUSTRY_KEY_LIST}],
   "theme": {
     "primaryColor": "#rrggbb",
     "secondaryColor": "#rrggbb",
@@ -44,19 +49,52 @@ fences) matching exactly this shape:
 
 Section shapes (every section needs a short unique "id" string):
 - hero: { "id", "type":"hero", "variant":"luxury"|"minimal"|"bold"|"split", "heading", "subheading"?, "description", "primaryCta", "secondaryCta"?, "imagePrompt"? }
-- services/features: { "id", "type":"services"|"features", "variant":"cards"|"list"|"grid", "heading"?, "description"?, "items":[{ "title","description","icon"? }] (1-8 items) }
+- services/features: { "id", "type":"services"|"features", "variant":"cards"|"list"|"grid", "heading"?, "description"?, "items":[{ "title","description","icon"?,"price"?,"meta"?,"ctaLabel"? }] (1-8 items), "isSampleData"? }
 - about: { "id", "type":"about", "heading", "description" }
 - testimonials: { "id", "type":"testimonials", "variant":"cards"|"carousel", "heading"?, "items":[{ "name","role"?,"quote","rating"? }] (1-6 items; "rating" is a whole number 1-5) }
 - gallery: { "id", "type":"gallery", "variant":"grid"|"masonry", "heading"?, "imageCount" (1-9) }
 - cta: { "id", "type":"cta", "heading", "description"?, "buttonLabel" }
 - contact: { "id", "type":"contact", "heading"?, "description"?, "showForm", "whatsapp" }
 
+INDUSTRY CLASSIFICATION: pick the "industryKey" that best matches the business — it drives
+which photography shows up in the preview, so get it as specific as the list allows (e.g. a
+pizza place is "restaurant-pizza", not "restaurant-general"; a nightclub is "bar-nightlife",
+not "events"). If the description is too vague to tell, use "general" and keep the rest of the
+concept polished and neutral rather than guessing wildly.
+
+MAKE IT LOOK LIKE THEIR BUSINESS, NOT A TEMPLATE: prioritize specific details in the
+description over the coarse industry/style/colors fields — if the visitor mentions a specific
+focus (e.g. "residential homes", "vegan menu", "loves Jamaican culture", "wants online
+quotes"), reflect that specifically rather than writing generically for the broad industry.
+
+LISTINGS: when a business naturally sells/shows discrete priced items — vehicles, menu items,
+property listings, room types, service packages, retail products — make ONE services/features
+section a listing: give each item a realistic, clearly-illustrative "price" (e.g. "$32,500",
+"$18"), a short "meta" spec line (e.g. "45,000 miles · Automatic", "3 bed · 2 bath · 1,800
+sqft", "Serves 2"), and a "ctaLabel" matching the action (e.g. "View Vehicle", "Order Now",
+"View Property", "Book Now"), and set that section's "isSampleData" to true. Examples:
+- Car dealership / auto sales -> vehicle listings with year/make/model, price, mileage, "View Vehicle"
+- Restaurant/pizza/cafe -> menu items with price, "Order Now"
+- Real estate -> property listings with price, beds/baths/sqft in "meta", "View Property"
+- Hotel -> room types with nightly price, "meta" amenities, "Book Now"
+- Barber/salon/gym/professional services -> service or membership packages with price, "Book Now"
+- Construction/contractor/cleaning/landscaping/home services -> project or service packages;
+  omit "price" if quote-based and use ctaLabel "Request a Quote" instead
+Never set "isSampleData" or add prices for a section that's just describing capabilities in
+general terms (no invented item is a real product) — only for a genuine item/listing grid.
+
 Colors must be real hex codes forming a coherent, accessible palette matching the requested
-style (backgroundColor and textColor must contrast well). Write genuinely good marketing copy
-for every heading/description/CTA — specific to the business described, never generic
-placeholder text like "Lorem ipsum" or "Your Heading Here". "icon" fields, if included, must
-be one of: sparkles, star, heart, shield, rocket, leaf, gem, clock, phone, mail, mapPin,
-utensils, hammer, briefcase, home, camera, palette, scale, shoppingBag, dumbbell.
+style (backgroundColor and textColor must contrast well) — and matching the industry's feel
+(e.g. a luxury car dealership or law firm should NOT look like a children's restaurant or a
+nightclub; a construction company should read differently from a beauty salon). Write
+genuinely good marketing copy for every heading/description/CTA — specific to the business
+described, never generic placeholder text like "Lorem ipsum" or "Your Heading Here". "icon"
+fields, if included, must be one of: sparkles, star, heart, shield, rocket, leaf, gem, clock,
+phone, mail, mapPin, utensils, hammer, briefcase, home, camera, palette, scale, shoppingBag,
+dumbbell.
+
+Any invented specifics (prices, inventory, stats, names, reviews) are illustrative example
+content to demonstrate the concept, never a claim about the visitor's real business.
 
 Respond with the JSON object only — no other text before or after it.
 `.trim();
@@ -154,7 +192,7 @@ async function generateWithRetry(messages: { role: "system" | "user"; content: s
       return validate(await callChatJson(messages));
     }
     if (err instanceof AiRateLimitError) {
-      await sleep(err.retryAfterMs);
+      await sleep(Math.min(err.retryAfterMs, MAX_BACKOFF_MS));
       return validate(await callChatJson(messages));
     }
     if (err instanceof AiProviderError) {

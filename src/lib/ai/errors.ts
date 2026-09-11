@@ -39,25 +39,43 @@ export async function withTimeout<T>(fn: (signal: AbortSignal) => Promise<T>): P
 }
 
 const DEFAULT_RETRY_AFTER_MS = 2_500;
-const MAX_RETRY_AFTER_MS = 6_000;
+// A provider-reported wait longer than this almost certainly means the
+// account is well over budget for the minute, not just brushing the limit —
+// sanity-cap what we'd ever display/wait on rather than trust an unbounded
+// number.
+const MAX_SUGGESTED_WAIT_MS = 60_000;
+// Separate, tighter cap on how long we'll actually sleep before our own
+// in-process retry (see AiRateLimitError) — a retry still needs to
+// comfortably fit inside the per-call timeout budget.
+export const MAX_BACKOFF_MS = 6_000;
 
-/** Reads how long to wait before retrying a 429 — the Retry-After header if
- * present, else Groq's "Please try again in X.Xs" wording in the error body,
- * else a small default. Capped so a retry still comfortably fits the
- * per-call timeout budget. */
+/** Reads how long the provider says to wait before retrying a 429 — the
+ * Retry-After header if present, else Groq's "Please try again in X.Xs"
+ * wording in the error body, else a small default. This is the *true*
+ * suggested wait (sanity-capped, not artificially shortened) — callers that
+ * sleep before an immediate in-process retry should further cap it with
+ * MAX_BACKOFF_MS; callers building a user-facing "try again in Ns" message
+ * should use it as-is. */
 export function parseRetryAfterMs(response: Response, body: string): number {
   const header = response.headers.get("retry-after");
   const headerSeconds = header ? Number(header) : NaN;
-  if (!Number.isNaN(headerSeconds)) return Math.min(headerSeconds * 1000, MAX_RETRY_AFTER_MS);
+  if (!Number.isNaN(headerSeconds)) return Math.min(headerSeconds * 1000, MAX_SUGGESTED_WAIT_MS);
 
   const match = body.match(/try again in ([\d.]+)s/i);
-  if (match) return Math.min(Number(match[1]) * 1000, MAX_RETRY_AFTER_MS);
+  if (match) return Math.min(Number(match[1]) * 1000, MAX_SUGGESTED_WAIT_MS);
 
   return DEFAULT_RETRY_AFTER_MS;
 }
 
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** User-facing "try again in Ns" phrasing for an AiRateLimitError, rounded
+ * up to a whole second (never "0 seconds"). */
+export function formatRetryMessage(retryAfterMs: number): string {
+  const seconds = Math.max(1, Math.ceil(retryAfterMs / 1000));
+  return `We're generating a lot of concepts right now. Please try again in about ${seconds} second${seconds === 1 ? "" : "s"}.`;
 }
 
 export function getGroqApiKey(): string {

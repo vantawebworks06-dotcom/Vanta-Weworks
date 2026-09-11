@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +61,16 @@ export default async function DashboardConceptPage({ params }: { params: Promise
           </Button>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-xl border border-border shadow-2xl">
+        <div className="mt-8 flex items-start gap-3 rounded-xl border border-border bg-surface/40 p-4 text-sm text-muted">
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-accent-2" aria-hidden="true" />
+          <p>
+            <span className="font-medium text-foreground">This is a preview concept</span>, not
+            the final representation of your website. Your final website will be customized and
+            refined based on your business, content, branding, and requirements.
+          </p>
+        </div>
+
+        <div className="mt-4 overflow-hidden rounded-xl border border-border shadow-2xl">
           <PreviewRenderer concept={parsed.data} />
         </div>
 

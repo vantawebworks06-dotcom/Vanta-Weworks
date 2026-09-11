@@ -1,18 +1,38 @@
 "use client";
 
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
-import type { Theme } from "@/lib/validations/concept";
+import type { IndustryKey, Theme } from "@/lib/validations/concept";
 
-const PreviewThemeContext = createContext<Theme | null>(null);
+type PreviewMeta = { theme: Theme; industryKey: IndustryKey };
 
-export function PreviewThemeProvider({ theme, children }: { theme: Theme; children: ReactNode }) {
-  return <PreviewThemeContext.Provider value={theme}>{children}</PreviewThemeContext.Provider>;
+const PreviewThemeContext = createContext<PreviewMeta | null>(null);
+
+export function PreviewThemeProvider({
+  theme,
+  industryKey,
+  children,
+}: {
+  theme: Theme;
+  industryKey: IndustryKey;
+  children: ReactNode;
+}) {
+  return <PreviewThemeContext.Provider value={{ theme, industryKey }}>{children}</PreviewThemeContext.Provider>;
+}
+
+function usePreviewMeta(): PreviewMeta {
+  const meta = useContext(PreviewThemeContext);
+  if (!meta) throw new Error("usePreviewTheme/useIndustryKey must be used within PreviewThemeProvider");
+  return meta;
 }
 
 export function usePreviewTheme(): Theme {
-  const theme = useContext(PreviewThemeContext);
-  if (!theme) throw new Error("usePreviewTheme must be used within PreviewThemeProvider");
-  return theme;
+  return usePreviewMeta().theme;
+}
+
+/** The AI-classified business category driving which stock-photo keywords
+ * the preview's imagery pulls from — see src/lib/visualizer/industry-visuals.ts. */
+export function useIndustryKey(): IndustryKey {
+  return usePreviewMeta().industryKey;
 }
 
 const CARD_RADIUS: Record<Theme["borderRadius"], string> = {

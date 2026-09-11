@@ -8,6 +8,21 @@ import { z } from "zod";
  * safe: there is no code path where AI output is interpreted as code.
  */
 
+/** A boolean field that also accepts "true"/"false" as strings (the model
+ * occasionally emits one) instead of hard-rejecting the whole generation
+ * over it — falls back to `defaultValue` for anything else unexpected. */
+function looseBoolean(defaultValue: boolean) {
+  return z
+    .preprocess((v) => {
+      if (typeof v === "string") {
+        if (v.toLowerCase() === "true") return true;
+        if (v.toLowerCase() === "false") return false;
+      }
+      return v;
+    }, z.boolean())
+    .catch(defaultValue);
+}
+
 export const themeSchema = z.object({
   primaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Must be a hex color"),
   secondaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Must be a hex color"),
@@ -19,6 +34,48 @@ export const themeSchema = z.object({
 });
 
 export type Theme = z.infer<typeof themeSchema>;
+
+/**
+ * Curated business categories the AI classifies a concept into. Drives which
+ * stock-photo keywords the preview pulls in (see
+ * src/lib/visualizer/industry-visuals.ts) so imagery actually matches the
+ * business instead of one generic look for every concept. "general" is the
+ * deliberate fallback for a prompt too vague to classify further.
+ */
+export const industryKeys = [
+  "automotive",
+  "auto-repair",
+  "restaurant-pizza",
+  "restaurant-general",
+  "bakery-cafe",
+  "bar-nightlife",
+  "construction",
+  "real-estate",
+  "barber",
+  "beauty-salon",
+  "gym-fitness",
+  "hotel-hospitality",
+  "clothing-fashion",
+  "legal",
+  "dental",
+  "medical-health",
+  "cleaning",
+  "landscaping",
+  "events",
+  "photography",
+  "electronics",
+  "travel",
+  "education",
+  "technology-saas",
+  "home-services",
+  "retail-general",
+  "nonprofit",
+  "general",
+] as const;
+
+export const industryKeySchema = z.enum(industryKeys).catch("general");
+
+export type IndustryKey = z.infer<typeof industryKeySchema>;
 
 const sectionBase = {
   id: z.string().min(1).max(40),
@@ -41,6 +98,13 @@ export const featureItemSchema = z.object({
   title: z.string().min(1).max(80),
   description: z.string().min(1).max(240),
   icon: z.string().max(40).optional(),
+  // Optional "listing" fields — used when this item is really a priced
+  // product/inventory/booking entry (a vehicle, a menu item, a property, a
+  // service package) rather than a plain feature description. Left unset for
+  // ordinary feature/service cards.
+  price: z.string().max(30).optional(),
+  meta: z.string().max(60).optional(),
+  ctaLabel: z.string().max(24).optional(),
 });
 
 export const servicesSectionSchema = z.object({
@@ -50,6 +114,10 @@ export const servicesSectionSchema = z.object({
   heading: z.string().max(120).optional(),
   description: z.string().max(300).optional(),
   items: z.array(featureItemSchema).min(1).max(8),
+  // True when items are illustrative example inventory/listings (vehicles,
+  // menu items, properties, price lists) rather than generic service
+  // descriptions — the preview labels these as sample content.
+  isSampleData: looseBoolean(false),
 });
 
 export const aboutSectionSchema = z.object({
@@ -103,8 +171,8 @@ export const contactSectionSchema = z.object({
   type: z.literal("contact"),
   heading: z.string().max(120).optional(),
   description: z.string().max(300).optional(),
-  showForm: z.boolean().default(true),
-  whatsapp: z.boolean().default(false),
+  showForm: looseBoolean(true),
+  whatsapp: looseBoolean(false),
 });
 
 export const sectionSchema = z.discriminatedUnion("type", [
@@ -129,6 +197,7 @@ export type ContactSection = z.infer<typeof contactSectionSchema>;
 export const websiteConceptSchema = z.object({
   businessName: z.string().min(1).max(100),
   style: z.string().min(1).max(60),
+  industryKey: industryKeySchema,
   theme: themeSchema,
   sections: z.array(sectionSchema).min(2).max(9),
 });

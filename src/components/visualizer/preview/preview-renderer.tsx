@@ -39,7 +39,7 @@ function renderSection(section: Section) {
  */
 export function PreviewRenderer({ concept }: { concept: WebsiteConcept }) {
   return (
-    <PreviewThemeProvider theme={concept.theme}>
+    <PreviewThemeProvider theme={concept.theme} industryKey={concept.industryKey}>
       <div style={{ fontFamily: fontFamilyFor(concept.theme), background: concept.theme.backgroundColor }}>
         <PreviewNav businessName={concept.businessName} theme={concept.theme} />
         {concept.sections.map((section) => (

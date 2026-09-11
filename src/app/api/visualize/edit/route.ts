@@ -4,7 +4,15 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { moderateText } from "@/lib/ai/moderation";
 import { editWebsiteConcept } from "@/lib/ai/concept";
-import { AiConfigError, AiModerationError, AiProviderError, AiTimeoutError, AiValidationError } from "@/lib/ai/errors";
+import {
+  AiConfigError,
+  AiModerationError,
+  AiProviderError,
+  AiRateLimitError,
+  AiTimeoutError,
+  AiValidationError,
+  formatRetryMessage,
+} from "@/lib/ai/errors";
 
 // See src/app/api/visualize/route.ts for why this needs more than the
 // platform default.
@@ -78,6 +86,9 @@ export async function POST(request: Request) {
         { status: 503 }
       );
     }
+    if (err instanceof AiRateLimitError) {
+      return NextResponse.json({ error: formatRetryMessage(err.retryAfterMs) }, { status: 429 });
+    }
     return NextResponse.json(
       { error: "The AI Visualizer isn't available right now. Please try again shortly." },
       { status: 503 }
@@ -113,6 +124,9 @@ export async function POST(request: Request) {
         { error: "We couldn't apply that change cleanly. Please try rephrasing it." },
         { status: 502 }
       );
+    }
+    if (err instanceof AiRateLimitError) {
+      return NextResponse.json({ error: formatRetryMessage(err.retryAfterMs) }, { status: 429 });
     }
     if (err instanceof AiProviderError) {
       return NextResponse.json(
