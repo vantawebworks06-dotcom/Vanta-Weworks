@@ -24,16 +24,12 @@ const FONT_STACK: Record<HeroDemoConfig["theme"]["font"], string> = {
  */
 export function HeroWebsiteDemo() {
   const [index, setIndex] = useState(0);
-  const [justChanged, setJustChanged] = useState(false);
 
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
 
     const timer = setInterval(() => {
       setIndex((i) => (i + 1) % heroDemoConfigs.length);
-      setJustChanged(true);
-      const clear = setTimeout(() => setJustChanged(false), TRANSITION_MS + 400);
-      return () => clearTimeout(clear);
     }, VISIBLE_MS);
 
     return () => clearInterval(timer);
@@ -41,7 +37,7 @@ export function HeroWebsiteDemo() {
 
   return (
     <div className="relative">
-      <DemoStatusLabel changing={justChanged} />
+      <DemoStatusLabel />
 
       <BrowserMockup className="shadow-[0_40px_120px_-40px_rgba(124,92,255,0.45)]">
         <div className="relative h-full w-full">
@@ -66,18 +62,16 @@ export function HeroWebsiteDemo() {
   );
 }
 
-function DemoStatusLabel({ changing }: { changing: boolean }) {
+function DemoStatusLabel() {
   return (
     <div className="pointer-events-none absolute -top-3.5 left-1/2 z-10 -translate-x-1/2">
       <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#0a0b10] px-3.5 py-1.5 text-[11px] font-medium text-muted shadow-lg">
         <span
-          className={cn("h-1.5 w-1.5 rounded-full", changing ? "bg-gold" : "bg-accent-2")}
-          style={{ boxShadow: `0 0 8px ${changing ? "var(--gold)" : "var(--accent-2)"}` }}
+          className="h-1.5 w-1.5 rounded-full bg-accent-2"
+          style={{ boxShadow: "0 0 8px var(--accent-2)" }}
           aria-hidden="true"
         />
         AI Website Preview
-        <span className="text-white/30">·</span>
-        <span className={changing ? "text-gold" : "text-accent-2"}>{changing ? "Generating" : "AI Generated"}</span>
       </span>
     </div>
   );
