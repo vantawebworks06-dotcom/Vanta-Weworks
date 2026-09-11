@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { forgotPasswordSchema } from "@/lib/validations/auth";
+import { friendlyAuthEmailError } from "@/lib/utils/auth-errors";
 import { Button } from "@/components/ui/button";
 
 const inputClass =
@@ -28,14 +29,25 @@ export function ForgotPasswordForm() {
 
     setSubmitting(true);
     const supabase = createClient();
-    await supabase.auth.resetPasswordForEmail(validated.data.email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(validated.data.email, {
       // Use the browser's own origin rather than an env var — see the
       // same note in signup-form.tsx.
       redirectTo: `${window.location.origin}/auth/confirm?type=recovery`,
     });
     setSubmitting(false);
-    // Always show success, regardless of whether the email exists, so this
-    // form can't be used to enumerate registered accounts.
+
+    // Supabase never reveals "no account with that email" through this
+    // call (it returns success either way), so surfacing its error here
+    // can't be used to enumerate registered accounts — it can only ever
+    // mean a real service problem (rate limit, misconfigured email
+    // sending, network failure). Silently claiming success on a genuine
+    // failure left people staring at "check your email" for an email that
+    // was never sent, with no way to know something was actually wrong.
+    if (error) {
+      setErrorMessage(friendlyAuthEmailError(error));
+      return;
+    }
+
     setSuccess(true);
   }
 

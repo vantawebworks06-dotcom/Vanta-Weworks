@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { signupSchema } from "@/lib/validations/auth";
+import { friendlyAuthEmailError } from "@/lib/utils/auth-errors";
 import { Button } from "@/components/ui/button";
 
 const inputClass =
@@ -11,10 +13,10 @@ const inputClass =
 const labelClass = "mb-1.5 block text-sm font-medium text-foreground/90";
 
 export function SignupForm() {
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,39 +42,41 @@ export function SignupForm() {
     }
 
     setSubmitting(true);
+
+    // Create the account server-side, pre-confirmed, with no email
+    // involved (see src/app/api/auth/signup/route.ts for why — Supabase's
+    // own signUp() has proven unreliable here, still attempting a
+    // confirmation email and hitting the project's shared rate limit even
+    // with "Confirm email" turned off).
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(validated.data),
+    });
+    const body = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      setSubmitting(false);
+      setErrorMessage(body?.error ?? "Something went wrong. Please try again.");
+      return;
+    }
+
+    // The account now exists and is confirmed; sign in for real so the
+    // browser's Supabase client sets up the actual session/cookies itself.
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signInWithPassword({
       email: validated.data.email,
       password: validated.data.password,
-      options: {
-        data: { full_name: validated.data.fullName },
-        // Use the browser's own origin rather than an env var, so this
-        // works correctly on localhost, Vercel preview URLs, and
-        // production without needing NEXT_PUBLIC_SITE_URL kept in sync.
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
-      },
     });
     setSubmitting(false);
 
     if (error) {
-      setErrorMessage(error.message);
+      setErrorMessage(friendlyAuthEmailError(error));
       return;
     }
 
-    setSuccess(true);
-  }
-
-  if (success) {
-    return (
-      <div role="status" className="flex flex-col items-center gap-3 py-4 text-center">
-        <CheckCircle2 className="h-8 w-8 text-accent-2" aria-hidden="true" />
-        <h2 className="font-display text-lg font-semibold">Check your email</h2>
-        <p className="text-sm text-muted">
-          We&apos;ve sent a confirmation link to finish creating your account. Once confirmed,
-          you&apos;ll be able to sign in and see your dashboard right away.
-        </p>
-      </div>
-    );
+    router.push("/dashboard");
+    router.refresh();
   }
 
   return (
