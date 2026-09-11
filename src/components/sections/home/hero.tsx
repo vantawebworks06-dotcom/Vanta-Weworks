@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { Reveal } from "@/components/ui/reveal";
-import { BrowserMockup } from "@/components/ui/browser-mockup";
+import { HeroWebsiteDemo } from "@/components/sections/home/hero-website-demo";
 
 export function Hero() {
   return (
@@ -55,38 +55,14 @@ export function Hero() {
           </Reveal>
         </div>
 
-        <Reveal delay={320} className="mt-20">
+        <Reveal delay={320} className="mt-24 sm:mt-28">
           <div className="relative mx-auto max-w-5xl">
             <div
               className="pointer-events-none absolute -inset-x-10 -top-10 -bottom-10 -z-10 opacity-40 blur-3xl"
               style={{ background: "var(--gradient-brand)" }}
               aria-hidden="true"
             />
-            <BrowserMockup className="shadow-[0_40px_120px_-40px_rgba(124,92,255,0.45)]">
-              <div className="flex h-full w-full flex-col justify-between bg-[#0a0b10] p-6 sm:p-10">
-                <div className="flex items-center justify-between">
-                  <div className="h-3 w-24 rounded-full bg-white/10" />
-                  <div className="flex gap-2">
-                    <div className="h-3 w-3 rounded-full bg-white/10" />
-                    <div className="h-3 w-3 rounded-full bg-white/10" />
-                    <div className="h-3 w-3 rounded-full bg-white/10" />
-                  </div>
-                </div>
-                <div className="flex flex-1 flex-col items-start justify-center gap-4 py-8">
-                  <div className="h-4 w-2/3 rounded-full bg-white/15 sm:w-1/2" />
-                  <div className="h-4 w-1/2 rounded-full bg-white/10 sm:w-1/3" />
-                  <div
-                    className="mt-4 h-10 w-40 rounded-full"
-                    style={{ background: "var(--gradient-brand)" }}
-                  />
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="h-16 rounded-lg border border-white/10 bg-white/[0.03]" />
-                  ))}
-                </div>
-              </div>
-            </BrowserMockup>
+            <HeroWebsiteDemo />
           </div>
         </Reveal>
       </Container>
