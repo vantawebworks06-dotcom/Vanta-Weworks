@@ -17,7 +17,14 @@ export function PricingOverview() {
           description="Every project starts with a conversation — these packages give you a clear starting point."
         />
 
-        <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <Reveal className="mx-auto mt-8 flex max-w-md flex-col items-center gap-1.5 text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent">
+            Vanta Launch Savings
+          </span>
+          <p className="text-sm text-muted">Limited-time promotional pricing</p>
+        </Reveal>
+
+        <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-3">
           {pricingTiers.map((tier, i) => (
             <Reveal key={tier.slug} delay={i * 100}>
               <Card
@@ -36,8 +43,18 @@ export function PricingOverview() {
                   <p className="mt-2 text-sm text-muted">{tier.description}</p>
                 </div>
                 <div>
-                  <span className="font-display text-4xl font-semibold">{tier.price}</span>
-                  <span className="ml-2 text-sm text-muted">{tier.cadence}</span>
+                  <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                    <span className="font-display text-4xl font-semibold">{tier.price}</span>
+                    <span className="text-lg font-medium text-muted/70 line-through">
+                      {tier.originalPrice}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <span className="text-sm text-muted">{tier.cadence}</span>
+                    <span className="inline-flex items-center rounded-full bg-accent-2/10 px-2.5 py-0.5 text-xs font-semibold text-accent-2">
+                      {tier.savings}
+                    </span>
+                  </div>
                 </div>
                 <ul className="flex flex-1 flex-col gap-3">
                   {tier.features.map((feature) =>

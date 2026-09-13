@@ -2,12 +2,18 @@
  * Real starting packages. Structured so prices and features can easily be
  * changed later (a future admin-managed pricing table is a reasonable next
  * step if prices need to change often without a code deploy).
+ *
+ * Vanta Launch Savings: temporary promotional pricing. `originalPrice` and
+ * `savings` back the strikethrough/"Save $X" presentation in the pricing
+ * cards — update all three fields together if pricing ever changes.
  */
 
 export type PricingTier = {
   slug: string;
   name: string;
   price: string;
+  originalPrice: string;
+  savings: string;
   cadence: string;
   description: string;
   features: string[];
@@ -20,70 +26,68 @@ export const pricingTiers: PricingTier[] = [
   {
     slug: "starter",
     name: "Starter",
-    price: "$650–$750",
+    price: "$450",
+    originalPrice: "$600",
+    savings: "Save $150",
     cadence: "USD",
-    description: "Best for businesses looking for a professional online presence.",
+    description: "Get your business online with a professional, modern website.",
     features: [
-      "1–4 pages",
-      "Mobile-responsive design",
+      "Up to 4 pages",
       "Custom website design",
-      "Contact/WhatsApp integration",
+      "Mobile responsive design",
+      "Contact & WhatsApp integration",
+      "Basic SEO setup",
       "Google Maps integration",
-      "Contact forms",
-      "Basic animations/interactions",
-      "Basic speed optimization",
-      "1–2 revisions",
+      "2 revisions",
     ],
-    maintenance: "Optional",
+    maintenance: "14 days of post-launch support",
     cta: "Start Your Project",
   },
   {
     slug: "professional",
     name: "Professional",
-    price: "$1,200–$1,500",
+    price: "$850",
+    originalPrice: "$1,050",
+    savings: "Save $200",
     cadence: "USD",
-    description: "Recommended for businesses looking for a more complete and advanced website.",
+    description:
+      "Turn visitors into customers with a professional website built around your business.",
     features: [
-      "Everything in Starter, plus:",
-      "5–8 pages",
-      "Basic SEO",
-      "Google Business optimization",
-      "Advanced animations/interactions",
-      "Booking system",
-      "Blog/news section",
-      "Analytics",
-      "Improved speed optimization",
-      "3–5 revisions",
-      "Online payments available as an optional feature",
+      "Up to 8 pages",
+      "Custom website design",
+      "Mobile responsive design",
+      "Contact & WhatsApp integration",
+      "Basic SEO setup",
+      "Google Maps integration",
+      "Advanced contact forms",
+      "Google Analytics integration",
+      "3 revisions",
     ],
-    maintenance: "Optional",
+    maintenance: "30 days of post-launch support",
     featured: true,
     cta: "Start Your Project",
   },
   {
     slug: "custom",
     name: "Custom",
-    price: "$3,000+",
+    price: "$1,500",
+    originalPrice: "$1,700",
+    savings: "Save $200",
     cadence: "USD",
-    description: "For businesses that want a complete, high-end website with advanced functionality.",
+    description:
+      "Build something bigger with custom functionality designed around your business.",
     features: [
-      "8+ pages",
+      "Custom number of pages",
       "Fully custom design",
-      "Mobile-responsive",
-      "WhatsApp/contact integration",
-      "Google Maps",
-      "Contact forms",
-      "Advanced SEO",
-      "Google Business optimization",
-      "Premium animations/interactions",
-      "Booking system",
-      "Online payments",
-      "Blog/news section",
-      "Analytics",
-      "Advanced speed optimization",
-      "Unlimited revisions during development",
+      "Mobile responsive design",
+      "Advanced functionality",
+      "E-commerce capabilities",
+      "Online booking systems",
+      "Customer accounts",
+      "Custom integrations",
+      "4 revisions",
     ],
-    maintenance: "1–3 months included",
+    maintenance: "60 days of post-launch support",
     cta: "Request a Custom Quote",
   },
 ];
