@@ -5,6 +5,7 @@ import { siteConfig } from "@/lib/site-config";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { HideOnAdmin } from "@/components/layout/hide-on-admin";
+import { ParticleBackground } from "@/components/layout/particle-background";
 import { OrganizationJsonLd } from "@/components/seo/organization-jsonld";
 import "./globals.css";
 
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
+        <ParticleBackground />
         <OrganizationJsonLd />
         <a
           href="#main-content"

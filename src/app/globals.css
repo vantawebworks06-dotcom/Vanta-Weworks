@@ -119,3 +119,25 @@ body {
     animation: none;
   }
 }
+
+@keyframes drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, 40px) scale(1.08); }
+}
+
+@keyframes drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-50px, -30px) scale(1.06); }
+}
+
+.glow-blob {
+  will-change: transform;
+}
+
+.glow-blob-a {
+  animation: drift-a 22s ease-in-out infinite;
+}
+
+.glow-blob-b {
+  animation: drift-b 26s ease-in-out infinite;
+}
